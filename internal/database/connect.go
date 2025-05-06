@@ -28,7 +28,9 @@ func ConnectDB(){
 		config.Config("DB_PASSWORD"),
 		config.Config("DB_NAME"),
 	)*/
-	DB, err= gorm.Open(sqlite.Open(config.Config("DB_Name")), &gorm.Config{})
+	fmt.Println(config.Config("DB_NAME"))
+
+	DB, err= gorm.Open(sqlite.Open(config.Config("DB_NAME")), &gorm.Config{})
 	if err != nil{
 		panic("failed to connect to database")
 

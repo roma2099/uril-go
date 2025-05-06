@@ -12,7 +12,7 @@ func main(){
 	app:= fiber.New(fiber.Config{
 		AppName:"Romario testing Apps",
 		CaseSensitive: true,
-		StrictRouting: true,
+		StrictRouting: false,
 		ServerHeader:"Fiber",
 
 	})
