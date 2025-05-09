@@ -1,0 +1,36 @@
+# Environment variables
+env
+.env
+
+# Go binaries and build files
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+bin/
+
+# Go testing and coverage
+*.test
+*.out
+coverage.txt
+
+# IDE specific files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS specific files
+.DS_Store
+Thumbs.db
+
+# Debug files
+debug
+
+# Dependency directories
+vendor/
+
+# Go workspace file
+go.work
+build-error.log
