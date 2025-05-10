@@ -110,7 +110,7 @@ func UpdateUser(c *fiber.Ctx) error {
 	var user model.User
 
 	db.First(&user, id)
-	user.Names = uui.Names
+	//user.Names = uui.Names // TODO: may cause some problems
 	db.Save(&user)
 
 	return c.JSON(fiber.Map{"status": "success", "message": "User successfully updated", "data": user})

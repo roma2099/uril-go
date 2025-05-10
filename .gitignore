@@ -34,3 +34,9 @@ vendor/
 # Go workspace file
 go.work
 build-error.log
+
+# Sqlite database files
+*_db
+
+#log files
+*.log
