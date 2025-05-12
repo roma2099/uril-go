@@ -8,8 +8,8 @@ import (
 
 type Result string
 const (
-	TimeOut Result = "time out"
-	GameOver Result = "game over"
+	TimeOut Result = "timeout"
+	GameOver Result = "gameover"
 	Resign Result = "resign"
 )
 

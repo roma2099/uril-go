@@ -40,3 +40,6 @@ build-error.log
 
 #log files
 *.log
+
+#testdb
+exmaple_db
