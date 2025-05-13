@@ -11,7 +11,14 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
 )
-
+type ResponseUser struct {
+		ID 		 uint `json:"id"`
+		Username string `json:"username"`
+		Email    string `json:"email"`
+		Elo    	 uint16 `json:"elo"`
+		Country  string `json:"country"`
+		
+}
 func hashPassword(password string) (string, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
 	return string(bytes), err
@@ -42,24 +49,28 @@ func validUser(id string, p string) bool {
 	return true
 }
 
-// GetUser get a user
+// GetUser get a user 
 func GetUser(c *fiber.Ctx) error {
 	id := c.Params("id")
 	db := database.DB
 	var user model.User
-	db.Find(&user, id)
+	db.Select("id","username","email","elo","country",).Find(&user, id)
 	if user.Username == "" {
 		return c.Status(404).JSON(fiber.Map{"status": "error", "message": "No user found with ID", "data": nil})
 	}
-	return c.JSON(fiber.Map{"status": "success", "message": "User found", "data": user})
+	resUser:=ResponseUser{
+		ID:			user.ID,
+		Email:    	user.Email,
+		Username: 	user.Username,
+		Elo:	  	user.Elo,
+		Country:	user.Country,
+	}
+	return c.JSON(fiber.Map{"status": "success", "message": "User found", "data": resUser})
 }
 
 // CreateUser new user
 func CreateUser(c *fiber.Ctx) error {
-	type NewUser struct {
-		Username string `json:"username"`
-		Email    string `json:"email"`
-	}
+
 
 	db := database.DB
 	user := new(model.User)
@@ -82,22 +93,30 @@ func CreateUser(c *fiber.Ctx) error {
 		return c.Status(500).JSON(fiber.Map{"status": "error", "message": "Couldn't create user", "errors": err.Error()})
 	}
 
-	newUser := NewUser{
-		Email:    user.Email,
-		Username: user.Username,
+	newUser := ResponseUser{
+		ID:			user.ID,
+		Email:    	user.Email,
+		Username: 	user.Username,
+		Elo:	  	user.Elo,
+		Country:	user.Country,
+
 	}
 
 	return c.JSON(fiber.Map{"status": "success", "message": "Created user", "data": newUser})
 }
 
 // UpdateUser update user
-func UpdateUser(c *fiber.Ctx) error {
+func UpdateUserCountry(c *fiber.Ctx) error {
 	type UpdateUserInput struct {
-		Names string `json:"names"`
+		Country string `json:"country" validate:"len=2"`
 	}
 	var uui UpdateUserInput
 	if err := c.BodyParser(&uui); err != nil {
 		return c.Status(500).JSON(fiber.Map{"status": "error", "message": "Review your input", "errors": err.Error()})
+	}
+		validate := validator.New()
+	if err := validate.Struct(uui); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"message": "Invalid request body", "errors": err.Error()})
 	}
 	id := c.Params("id")
 	token := c.Locals("user").(*jwt.Token)
@@ -110,7 +129,7 @@ func UpdateUser(c *fiber.Ctx) error {
 	var user model.User
 
 	db.First(&user, id)
-	//user.Names = uui.Names // TODO: may cause some problems
+	user.Country = uui.Country // TODO: may cause some problems
 	db.Save(&user)
 
 	return c.JSON(fiber.Map{"status": "success", "message": "User successfully updated", "data": user})
