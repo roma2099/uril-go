@@ -11,4 +11,6 @@ type Game struct{
 	Duration 	time.Duration `gorm:"not null" validate:"required" json:"duration"`
 	Result		Result `gorm:"not null;type:text" validate:"required,oneof=timeout gameover resign" json:"result"`
 	Plays 		[]Play `json:"plays"`
+	GamePlayers   []GamePlayer `json:"players"`
+	
 }

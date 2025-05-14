@@ -32,6 +32,6 @@ func SetUpRoutes(app *fiber.App){
 	// Game
 	game :=api.Group("/game")
 	game.Get("/history/:user_id", handler.GetGamesHistory)
-	//game.Get("/:id",handler.GetGameDetails)
+	game.Get("/:id",handler.GetGame)
 }
 
