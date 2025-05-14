@@ -28,5 +28,10 @@ func SetUpRoutes(app *fiber.App){
 	product.Get("/:id", handler.GetProduct)
 	product.Post("/", middleware.Protected(), handler.CreateProduct)
 	product.Delete("/:id", middleware.Protected(), handler.DeleteProduct)
+
+	// Game
+	game :=api.Group("/game")
+	game.Get("/history/:user_id", handler.GetGamesHistory)
+	//game.Get("/:id",handler.GetGameDetails)
 }
 
