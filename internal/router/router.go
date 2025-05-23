@@ -1,11 +1,14 @@
 package router
 
 import (
+	"log"
+	
 	"github.com/roma2099/uril-go/internal/middleware"
 	"github.com/roma2099/uril-go/internal/handler"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
+	"github.com/gofiber/contrib/websocket"
 )
 
 func SetUpRoutes(app *fiber.App){
@@ -19,7 +22,7 @@ func SetUpRoutes(app *fiber.App){
 	user := api.Group("/user")
 	user.Get("/:id", handler.GetUser)
 	user.Post("/", handler.CreateUser)
-	user.Patch("/:id", middleware.Protected(), handler.UpdateUserCountry)
+	user.Patch("/", middleware.Protected(), handler.UpdateUserCountry)
 	user.Delete("/:id", middleware.Protected(), handler.DeleteUser)
 
 	// Product
@@ -33,5 +36,16 @@ func SetUpRoutes(app *fiber.App){
 	game :=api.Group("/game")
 	game.Get("/history/:user_id", handler.GetGamesHistory)
 	game.Get("/:id",handler.GetGame)
+	game.Use(func(c *fiber.Ctx) error {
+				if websocket.IsWebSocketUpgrade(c) { // Returns true if the client requested upgrade to the WebSocket protocol
+			return c.Next()
+		}
+		return c.SendStatus(fiber.StatusUpgradeRequired)
+	})
+	game.Get("/ws/:id", websocket.New(func(c *websocket.Conn) {
+		if err := handler.GameWebSocketHandler(c); err != nil {
+			log.Printf("WebSocket handler error: %v", err)
+		}
+	})) 
 }
 

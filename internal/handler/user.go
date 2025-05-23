@@ -114,22 +114,20 @@ func UpdateUserCountry(c *fiber.Ctx) error {
 	if err := c.BodyParser(&uui); err != nil {
 		return c.Status(500).JSON(fiber.Map{"status": "error", "message": "Review your input", "errors": err.Error()})
 	}
-		validate := validator.New()
+	validate := validator.New()
 	if err := validate.Struct(uui); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"message": "Invalid request body", "errors": err.Error()})
 	}
-	id := c.Params("id")
-	token := c.Locals("user").(*jwt.Token)
 
-	if !validToken(token, id) {
-		return c.Status(500).JSON(fiber.Map{"status": "error", "message": "Invalid token id", "data": nil})
-	}
+	token := c.Locals("user").(*jwt.Token)
+	claims := token.Claims.(jwt.MapClaims)
+	id := uint(claims["user_id"].(float64))
 
 	db := database.DB
 	var user model.User
 
 	db.First(&user, id)
-	user.Country = uui.Country // TODO: may cause some problems
+	user.Country = uui.Country
 	db.Save(&user)
 
 	return c.JSON(fiber.Map{"status": "success", "message": "User successfully updated", "data": user})
